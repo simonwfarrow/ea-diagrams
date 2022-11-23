@@ -1,0 +1,28 @@
+{
+  "name": "@electronic-architect/ea-diagrams",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "src/index.js",
+  "description": "Diagram module for electronic architect",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonwfarrow/ea-diagrams.git"
+  },
+  "keywords": [
+    "architecture",
+    "diagrams",
+    "c4",
+    "plantuml",
+    "electronic-architect"
+  ],
+  "author": "simonwfarrow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simonwfarrow/ea-diagrams/issues"
+  },
+  "homepage": "https://github.com/simonwfarrow/ea-diagrams#readme"
+}

@@ -1,6 +1,6 @@
 // Based on https://plantuml.com/code-javascript-asynchronous
 
-import {deflate} from './rawdeflate'
+import {deflate} from './rawdeflate.js'
 
 function encode64(data) {
     let r = "";

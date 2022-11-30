@@ -1,3 +1,4 @@
-import {compress} from "./plantuml/compress";
+import { compress } from "./plantuml/compress";
+import { getPlantUrl } from "./plantuml/utils";
 
-export { compress }
+export { compress, getPlantUrl }

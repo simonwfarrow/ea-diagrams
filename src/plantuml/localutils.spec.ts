@@ -26,7 +26,7 @@ describe('The utils module', function() {
             '@enduml\n'
 
         getPlantSVG(plantuml, '/tmp/test.puml');
-        fs.access('/tmp/test.svg', fs.F_OK, (err) => {
+        fs.access('/tmp/test.svg', fs.constants.F_OK, (err) => {
             if (err) {
                 assert.fail('svg not created')
             }

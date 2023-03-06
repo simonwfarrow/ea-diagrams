@@ -1,13 +1,6 @@
 import {expect} from "chai";
 import {ServiceDescriptor} from "@electronic-architect/ea-services/src/index.js";
-import {
-    createContainer,
-    createContainerFromName,
-    createRelationship, createRelationshipFromName,
-    createSystem,
-    getFooter,
-    getHeader
-} from "./c4.js";
+import {createServiceInteractionView} from "./service-interaction-view.js";
 
 const sdStr : string  = 'name: Example Service\n' +
     'description: Example of a service descriptor\n' +
@@ -100,64 +93,24 @@ const sdStr : string  = 'name: Example Service\n' +
     '    encryption: tls\n' +
     '  at_rest_encryption: N/A';
 
-describe('The c4 module', function() {
-    it('generates the system c4 plantuml string from a service descriptor', function () {
+describe('The service-interaction-view module', function() {
+    it('generates the a container interaction view from a service descriptor', function () {
 
         let sd: ServiceDescriptor = new ServiceDescriptor(sdStr);
 
-        const result = createSystem(sd);
+        const result = createServiceInteractionView(sd);
 
-        expect('System(exampleservice, "Example Service", $descr=\"Example of a service descriptor\")\n').to.eq(result);
-
-    })
-    it('generates the container c4 plantuml string from a service descriptor', function () {
-
-        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr);
-
-        const result = createContainer(sd);
-
-        expect('Container(exampleservice, "Example Service", $descr=\"Example of a service descriptor\")\n').to.eq(result);
-
-    })
-    it('generates the container c4 plantuml string from a name', function () {
-
-        const result = createContainerFromName('I am a named container','I only live to test');
-
-        expect('Container(iamanamedcontainer, "I am a named container", $descr=\"I only live to test\")\n').to.eq(result);
-
-    })
-    it('generates the relationship c4 plantuml string for two services', function () {
-
-        let sd1: ServiceDescriptor = new ServiceDescriptor(sdStr);
-        let sd2: ServiceDescriptor = new ServiceDescriptor(sdStr);
-
-        const result = createRelationship(sd1,sd2, 'Uses');
-
-        expect('Rel(exampleservice, exampleservice, "Uses")\n').to.eq(result);
-
-    })
-    it('generates the relationship c4 plantuml string for two named services', function () {
-
-        const result = createRelationshipFromName('Service1','Service2', 'Uses');
-
-        expect('Rel(service1, service2, "Uses")\n').to.eq(result);
-
-    })
-    it('returns the c4 plantuml header', function () {
-
-        const result = getHeader();
-
-        expect("@startuml\nskinparam backgroundColor transparent\n" +
-            "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n" +
-            "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\n" +
-            "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n").to.eq(result);
-
-    })
-    it('returns the c4 plantuml footer', function () {
-
-        const result = getFooter();
-
-        expect("@enduml").to.eq(result);
+        expect('@startuml\n' +
+            'skinparam backgroundColor transparent\n' +
+            '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n' +
+            '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\n' +
+            '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n' +
+            'Container(exampleservice, "Example Service", $descr="Example of a service descriptor")\n' +
+            'Container(service2, "Service 2", $descr="Calls our service")\n' +
+            'Container(service3, "Service 3", $descr="Our service call this service")\n' +
+            'Rel(service2, exampleservice, "Calls our service")\n' +
+            'Rel(exampleservice, service3, "Our service call this service")\n' +
+            '@enduml').to.eq(result);
 
     })
 })

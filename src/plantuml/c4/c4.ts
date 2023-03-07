@@ -44,6 +44,18 @@ export function createRelationshipFromName(fromService: string, toService: strin
  *
  * @param fromService
  * @param toService
+ * @param index
+ * returns a c4 plantuml relationship between two named services
+ */
+export function createRelationshipFromNameWithIndex(fromService: string, toService: string, label: string, index: number): string {
+    return `RelIndex(${index}, ${formatName(fromService)}, ${formatName(toService)}, \"${label}\")\n`
+
+}
+
+/**
+ *
+ * @param fromService
+ * @param toService
  * returns a c4 plantuml relationship between two services
  */
 export function createRelationship(fromService: ServiceDescriptor, toService: ServiceDescriptor, label: string): string {
@@ -58,7 +70,8 @@ export function getHeader(): string {
     return "@startuml\nskinparam backgroundColor transparent\n" +
         "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n" +
         "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\n" +
-        "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n"
+        "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n" +
+        "!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml\n"
 }
 
 /**

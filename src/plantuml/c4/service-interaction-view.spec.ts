@@ -105,9 +105,10 @@ describe('The service-interaction-view module', function() {
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n' +
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml\n' +
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n' +
+            '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml\n' +
             'Container(exampleservice, "Example Service", $descr="Example of a service descriptor")\n' +
-            'Container(service2, "Service 2", $descr="Calls our service")\n' +
-            'Container(service3, "Service 3", $descr="Our service call this service")\n' +
+            'Container(service2, "Service 2", $descr="")\n' +
+            'Container(service3, "Service 3", $descr="")\n' +
             'Rel(service2, exampleservice, "Calls our service")\n' +
             'Rel(exampleservice, service3, "Our service call this service")\n' +
             '@enduml').to.eq(result);

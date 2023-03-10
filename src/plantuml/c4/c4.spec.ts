@@ -9,7 +9,8 @@ import {
     getHeader
 } from "./c4.js";
 
-const sdStr : string  = 'name: Example Service\n' +
+const sdStr : string  = '_path: resources/service_descriptors/example.yml\n' +
+    'name: Example Service\n' +
     'description: Example of a service descriptor\n' +
     'type: platform\n' +
     'status: Live\n' +
@@ -103,7 +104,7 @@ const sdStr : string  = 'name: Example Service\n' +
 describe('The c4 module', function() {
     it('generates the system c4 plantuml string from a service descriptor', function () {
 
-        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr);
+        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr,'resources/service_descriptors/actor2.yml')
 
         const result = createSystem(sd);
 
@@ -112,7 +113,7 @@ describe('The c4 module', function() {
     })
     it('generates the container c4 plantuml string from a service descriptor', function () {
 
-        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr);
+        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr, 'resources/service_descriptors/actor2.yml');
 
         const result = createContainer(sd);
 
@@ -128,8 +129,8 @@ describe('The c4 module', function() {
     })
     it('generates the relationship c4 plantuml string for two services', function () {
 
-        let sd1: ServiceDescriptor = new ServiceDescriptor(sdStr);
-        let sd2: ServiceDescriptor = new ServiceDescriptor(sdStr);
+        let sd1: ServiceDescriptor = new ServiceDescriptor(sdStr, 'resources/service_descriptors/actor2.yml');
+        let sd2: ServiceDescriptor = new ServiceDescriptor(sdStr, 'resources/service_descriptors/actor2.yml');
 
         const result = createRelationship(sd1,sd2, 'Uses');
 

@@ -96,7 +96,7 @@ const sdStr : string  = 'name: Example Service\n' +
 describe('The service-interaction-view module', function() {
     it('generates the a container interaction view from a service descriptor', function () {
 
-        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr);
+        let sd: ServiceDescriptor = new ServiceDescriptor(sdStr, 'resources/service_descriptors/actor2.yml');
 
         const result = createServiceInteractionView(sd);
 

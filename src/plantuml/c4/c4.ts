@@ -47,7 +47,7 @@ export function createRelationshipFromName(fromService: string, toService: strin
  * @param index
  * returns a c4 plantuml relationship between two named services
  */
-export function createRelationshipFromNameWithIndex(fromService: string, toService: string, label: string, index: number): string {
+export function createRelationshipFromNameWithIndex(fromService: string, toService: string, label: string | undefined, index: number): string {
     return `RelIndex(${index}, ${formatName(fromService)}, ${formatName(toService)}, \"${label}\")\n`
 
 }

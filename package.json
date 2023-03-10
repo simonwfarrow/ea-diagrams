@@ -45,7 +45,9 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@electronic-architect/ea-content": "file:../ea-content/electronic-architect-ea-content-1.0.0.tgz",
     "@electronic-architect/ea-flows": "file:../ea-flows/electronic-architect-ea-flows-1.0.0.tgz",
-    "@electronic-architect/ea-services": "file:../ea-services/electronic-architect-ea-services-1.0.0.tgz"
+    "@electronic-architect/ea-services": "file:../ea-services/electronic-architect-ea-services-1.0.0.tgz",
+    "dotenv": "^16.0.3"
   }
 }

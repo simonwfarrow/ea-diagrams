@@ -15,20 +15,22 @@ export function createServiceInteractionView(service: ServiceDescriptor) : strin
     puml += createContainer(service);
 
     // write out all the containers first as they must exist before relationships can be made
-    for (const [key,interaction] of Object.entries(service.interactions)){
-        puml += createContainerFromName(interaction.name, '');
-    }
-
-    // now write out all the relationships between the services
-    for (const [key,interaction] of Object.entries(service.interactions)){
-        switch (interaction.flow_direction) {
-            case 'in':
-                puml += createRelationshipFromName(interaction.name, service.name, interaction.description);
-                break;
-            case 'out':
-                puml += createRelationshipFromName(service.name, interaction.name, interaction.description);
+    if (service.interactions !=null) {
+        for (const [key, interaction] of Object.entries(service.interactions)) {
+            puml += createContainerFromName(interaction.name, '');
         }
 
+        // now write out all the relationships between the services
+        for (const [key, interaction] of Object.entries(service.interactions)) {
+            switch (interaction.flow_direction) {
+                case 'in':
+                    puml += createRelationshipFromName(interaction.name, service.name, interaction.description);
+                    break;
+                case 'out':
+                    puml += createRelationshipFromName(service.name, interaction.name, interaction.description);
+            }
+
+        }
     }
 
     puml += getFooter();

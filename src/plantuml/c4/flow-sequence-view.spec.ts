@@ -145,7 +145,7 @@ const sdStr : string  = '_path: resources/service_descriptors/actor2.yml\n' +
     '  at_rest_encryption: N/A';
 
 describe('The flow-sequence-view module', function() {
-    it('generates a container c4 diagram from a flow descriptor', function () {
+    it('generates a container c4 diagram from a flow descriptor', async () =>  {
 
         let fd: FlowDescriptor  = new FlowDescriptor(fdStr);
         let service = new ServiceDescriptor(sdStr,'resources/service_descriptors/actor2.yml');
@@ -159,8 +159,7 @@ describe('The flow-sequence-view module', function() {
             repo: 'ea-resources'
         };
 
-        const result = createFlowSequenceView(fd, services, config);
-
+        const result = await createFlowSequenceView(fd, services, config);
         expect('@startuml\n' +
             'skinparam backgroundColor transparent\n' +
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml\n' +
@@ -168,11 +167,17 @@ describe('The flow-sequence-view module', function() {
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml\n' +
             '!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml\n' +
             'Container(actor1, "Actor1", $descr="")\n' +
-            'Container(exampleservice, "Example Service", $descr="")\n' +
+            'Container(exampleservice, "Example Service", $descr="Example of a service descriptor")\n' +
             'Container(actor3, "actor3", $descr="")\n' +
-            'RelIndex(0, actor1, actor2, "First Step")\n' +
-            'RelIndex(1, actor2, actor3, "Another request")\n' +
+            'Container(actor4, "Actor4", $descr="")\n' +
+            'RelIndex(0, actor1, exampleservice, "First Step")\n' +
+            'RelIndex(1, exampleservice, actor3, "Another request")\n' +
+            'RelIndex(2, actor4, exampleservice, "First Step")\n' +
+            'RelIndex(3, exampleservice, actor3, "Another request")\n' +
             '@enduml').to.eq(result);
+
+
+
 
     })
 })

@@ -9,41 +9,49 @@ import {FlowRepositoryGitHub} from "@electronic-architect/ea-flows/src/index.js"
  * @param flow Flow to create view for
  * returns plantuml string of a c4 view showing sequences
  */
-export function createFlowSequenceView(flow: FlowDescriptor, services: ServiceDescriptor[], config: any) : string {
+export const createFlowSequenceView = async(flow: FlowDescriptor, services: ServiceDescriptor[], config: any): Promise<string> =>{
 
     let puml: string = '';
     let actorMap: Map<string,Actor> = new Map<string,Actor>();
     let relIndex = {index: 0} //use object so we can pass by ref
+    let promiseArray: Promise<any>[] = [];
 
     puml += getHeader();
 
-    flow.steps.forEach(step => {processContainerStep(step, actorMap, config)})
+    for (let step in flow.steps){
+        promiseArray.push(processContainerStep(flow.steps[step], actorMap, config));
+    }
+    await Promise.all(promiseArray);
 
     puml += processActors(actorMap, services);
 
-    flow.steps.forEach(step => {puml += processRelationshipStep(step, relIndex, config)})
+    for (let step in flow.steps){
+        await processRelationshipStep(flow.steps[step], relIndex, config, actorMap, services).then(data=>puml+=data);
+    }
 
     puml += getFooter();
 
-    return puml;
+    return Promise.resolve(puml);
 }
+
+
 
 /**
  * Because actors will repeat this functions updates a map keyed on actor name
  * @param step The step to process
  * updates the actor map
  */
-function processContainerStep(step: Step, actorMap: Map<string,Actor>, config: any) {
+const processContainerStep = async (step: Step, actorMap: Map<string,Actor>, config: any) => {
 
+    let promiseArray: Promise<any>[] = [];
     //if this step is a reference, load the flow
     if (step.$ref != null) {
-        loadExternalFlow(step.$ref, config).then(flow => {
+        promiseArray.push(loadExternalFlow(step.$ref, config).then(flow => {
+            for (let subStep in flow.steps){
+                promiseArray.push(processContainerStep(flow.steps[subStep],actorMap, config));
+            }
+        }))
 
-            flow.steps?.forEach(subStep => {processContainerStep(subStep,actorMap, config)})
-
-        }).catch(error => {
-            console.log(error)
-        });
     } else {
 
         if (step.producer?.name != null) {
@@ -59,7 +67,12 @@ function processContainerStep(step: Step, actorMap: Map<string,Actor>, config: a
 
     }
 
-    step.steps?.forEach(step => {processContainerStep(step,actorMap, config)})
+    for (let subStep in step.steps){
+        // @ts-ignore
+        promiseArray.push(processContainerStep(step.steps[subStep],actorMap, config));
+    }
+
+    await Promise.all(promiseArray);
 }
 
 /**
@@ -67,10 +80,11 @@ function processContainerStep(step: Step, actorMap: Map<string,Actor>, config: a
  * @param ref
  * returns a FlowDescriptor loaded externally
  */
-function loadExternalFlow(ref: string, config: any): Promise<FlowDescriptor>{
+const loadExternalFlow = async(ref: string, config: any): Promise<FlowDescriptor> =>{
     const repo = new FlowRepositoryGitHub()
     config.path = ref;
     return repo.getFlow(config);
+
 }
 
 /**
@@ -80,19 +94,11 @@ function loadExternalFlow(ref: string, config: any): Promise<FlowDescriptor>{
 function processActors(actorMap: Map<string,Actor>, services: ServiceDescriptor[]): string {
 
     let puml: string = '';
-    let containerName = '';
 
     actorMap.forEach((actor, key) => {
         //is there a $ref to a service descriptor?
-        containerName = key;
-        if (actor.$ref != null){
-            const service = services.find((service) => service._path === actor.$ref)
-            if (service != null){
-                containerName = service.name;
-            }
-
-        }
-        puml += createContainerFromName(containerName, '');
+        const [containerName, description] = getContainerNameForActor(key, actorMap,services);
+        puml += createContainerFromName(containerName, description);
     })
 
     return puml;
@@ -102,28 +108,60 @@ function processActors(actorMap: Map<string,Actor>, services: ServiceDescriptor[
 
 /**
  *
+ * @param actorName
+ * @param actorMap
+ * @param services
+ * return the name of the actor, looked up the service descriptors if a $ref was supplied
+ */
+function getContainerNameForActor(actorName: string, actorMap: Map<string,Actor>, services: ServiceDescriptor[]){
+    let actor: Actor | undefined = actorMap.get(actorName);
+    let containerName: string = actorName;
+    let description = '';
+
+    if (actor !=null) {
+        if (actor.$ref != null){
+            const service = services.find((service) => service._path === actor?.$ref)
+            if (service != null){
+                containerName = service.name;
+                description = service.description;
+            }
+
+        }
+    }
+    return [containerName, description] as const;
+}
+
+/**
+ *
  * @param step The step to process to create relationships for
  * returns the plantuml relationship string for this step
  */
-function processRelationshipStep(step: Step, relIndex: any, config:any): string {
+const processRelationshipStep = async(step: Step, relIndex: any, config:any, actorMap: Map<string,Actor>, services: ServiceDescriptor[]): Promise<string> => {
 
     let puml: string = '';
 
     if (step.$ref != null) {
-        loadExternalFlow(step.$ref, config).then(flow => {
-            flow.steps?.forEach(subStep => {
-                processRelationshipStep(subStep, relIndex, config)
-            })
+        const flow = await loadExternalFlow(step.$ref, config);
+        for (let subStep in flow.steps){
+            //we cannot use Promise.all as they may complete in the wrong order
+            await processRelationshipStep(flow.steps[subStep], relIndex, config, actorMap, services).then(data=>{puml+=data});
+        }
 
-        }).catch(error => {
-            console.log("Referenced flow could not be loaded")
-        });
     }
 
     if (step.producer?.name !=null && step.consumer?.name !=null) {
-        puml += createRelationshipFromNameWithIndex(step.producer.name, step.consumer.name, step.description, relIndex.index++);
+        const [pName, pDescription] = getContainerNameForActor(step.producer.name, actorMap, services);
+        const [cName, cDescription] = getContainerNameForActor(step.consumer.name, actorMap, services);
+        puml += createRelationshipFromNameWithIndex(pName, cName, step.description, relIndex.index++);
     }
-    step.steps?.forEach(step => {puml += processRelationshipStep(step,relIndex, config)})
+
+
+    for (let subStep in step.steps){
+        //we cannot use Promise.all as they may complete in the wrong order
+        // @ts-ignore
+        await processRelationshipStep(step.steps[subStep],relIndex, config, actorMap, services).then(data => puml+=data);
+
+    }
 
     return puml;
 }

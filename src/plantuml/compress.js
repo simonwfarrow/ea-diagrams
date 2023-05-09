@@ -53,7 +53,7 @@ function encode6bit(b) {
 }
 
 function done_deflating(e) {
-    return "https://kroki.io/plantuml/svg/"+encode64(e.data);
+    return "https://www.plantuml.com/plantuml/svg/"+encode64(e.data);
 }
 
 export function compress(s) {

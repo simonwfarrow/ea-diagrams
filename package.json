@@ -7,6 +7,9 @@
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "bin": "bin/plantuml.jar",
+  "browser":{
+    "child_process": false
+  },
   "scripts": {
     "test": "npm run test-ts-unit",
     "test-ts-unit": "ts-node ./node_modules/mocha/bin/mocha  --loader=ts-node/esm --extension ts 'src/**/*.spec.ts' --recursive",

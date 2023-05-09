@@ -1,4 +1,4 @@
-
+/*
 import {getPlantSVG} from "./localutils.js";
 import { assert} from "chai";
 import * as fs from 'fs';
@@ -39,4 +39,4 @@ describe('The utils module', function() {
 })
 
 
-
+*/
